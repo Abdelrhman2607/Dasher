@@ -112,7 +112,7 @@ class Game:
             Fish((fish_pos.x, fish_pos.y), self.fish_img, fish_pos.number, self.fish_sprites)
             self.fish_positions_states[fish_pos.number] = True
 
-            self.pointers.append(Pointer( "#C34D4D", self.player, (fish_pos.x, fish_pos.y), self.all_sprites.offset))
+            self.pointers.append(Pointer( "#FFE2E2", self.player, (fish_pos.x, fish_pos.y), self.all_sprites.offset))
             # print(self.fish_positions_states)
 
 
