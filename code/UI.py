@@ -54,11 +54,11 @@ class StartMenu:
         self.display_surf = pygame.display.get_surface()
         self.active = True
 
-        self.text_surf = self.font.render("Press Enter to Start", True, 'white')
-        self.text_rect = self.text_surf.get_frect(center = CENTER)
+        self.text_surf = self.font.render("Press Enter to Start", True, 'black')
+        self.text_rect = self.text_surf.get_frect(center = (WINDOW_WIDTH/2, WINDOW_HEIGHT * 3/4))
 
     def draw(self):
-        self.display_surf.fill("black")
+        # self.display_surf.fill("black")
         self.display_surf.blit(self.text_surf, self.text_rect)
 
     def input(self):
@@ -151,6 +151,8 @@ class Pointer:
         triangle_points = [(self.pointer_width / 6,self.pointer_height / 4),
                            (self.pointer_width * 5/6, self.pointer_height / 4),
                            (self.pointer_width/2, self.pointer_height / 6)]
+        
+        pygame.draw.polygon(self.original_pointer_surf, "black", triangle_points, 5)
         pygame.draw.polygon(self.original_pointer_surf, self.color, triangle_points)
 
     def rotate(self):
@@ -167,3 +169,7 @@ class Pointer:
         self.display_surf.blit(self.pointer_surf, self.pointer_rect)
         #(self.anchor.centerx - self.pointer_width/2 - self.offset.x,self.anchor.centery - self.pointer_height/2 - self.offset.y)
         #pygame.draw.line(self.display_surf, "red", self.tracker.rect.center - self.offset, self.target_point - self.offset, 20)
+
+class FishCounter:
+    def __init__(self):
+        pass

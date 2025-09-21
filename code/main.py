@@ -7,7 +7,7 @@ from UI import *
 from sprites import *
 from pytmx.util_pygame import load_pygame
 
-
+#TODO add arrow outline
 class Game:                     
     def __init__(self):
         pygame.init()
@@ -24,6 +24,10 @@ class Game:
         self.previous_state = "start"
         
         self.start_menu = StartMenu(self.font_path)
+        self.logo = pygame.image.load(join("images", "logo.png")).convert_alpha()
+        self.bg = pygame.image.load(join("images", "bg.png")).convert_alpha()
+        self.bg_speed = 25
+        self.bg_x = 0
 
         self.pause_menu = PauseMenu(self.font_path, 500, 200 , 30, "PAUSED", "Press 'P' to unpause", "BGM volume:", "SFX volume:")
         self.bgm_volume_slider = Slider((self.pause_menu.rect.left + 200, self.pause_menu.rect.centery + 25), 250, 0, 1)
@@ -85,6 +89,11 @@ class Game:
             elif obj.name == "fish":
                 self.fish_positions.append(obj)
 
+    def bg_scroll(self, dt):
+        self.display_surface.blit(self.bg, (self.bg_x,0))
+        self.display_surface.blit(self.bg, (self.bg_x - WINDOW_WIDTH,0))
+        self.bg_x += dt * self.bg_speed
+        self.bg_x %= WINDOW_WIDTH
          
     def menu_input(self):
         pressed_keys = pygame.key.get_just_pressed()
@@ -136,6 +145,8 @@ class Game:
                     self.running = False
 
             if self.state == "start":
+                self.bg_scroll(dt)
+                self.display_surface.blit(self.logo, (WINDOW_WIDTH/3.5, 50))
                 self.start_menu.draw()
                 self.start_menu.input()
 
@@ -202,7 +213,6 @@ class Game:
                     
                 # pygame.draw.rect(self.display_surface, "red", pygame.FRect(self.player_marker.x - self.all_sprites.offset.x, self.player_marker.y- self.all_sprites.offset.y, 5,5))
 
-
             elif self.state == "paused":
                 self.pause_menu.draw()
                 
@@ -213,9 +223,7 @@ class Game:
                 for sound in self.sfx.keys():
                     self.sfx[sound].set_volume(self.sfx_volume_slider.magnitude)
                 
-
             self.menu_input()
-            #print(self.state, self.previous_state)
             pygame.display.update()
 
         pygame.quit()
