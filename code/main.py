@@ -38,7 +38,7 @@ class Game:
         self.vfx_sprites = AllSprites()
 
         self.pointers = []
-
+        self.fish_counter = FishCounter()
 
         self.dash_pulse_started = False
 
@@ -109,7 +109,6 @@ class Game:
                 self.previous_state = self.state 
                 self.state = "paused"
             
-
     def spawn_fish(self):
         available_pos = [pos for pos in self.fish_positions if not(self.fish_positions_states[pos.number])]
         
@@ -124,14 +123,21 @@ class Game:
             self.pointers.append(Pointer( "#FFE2E2", self.player, (fish_pos.x, fish_pos.y), self.all_sprites.offset))
             # print(self.fish_positions_states)
 
-
     def fish_collision(self):
         collisions = pygame.sprite.spritecollide(self.player, self.fish_sprites, dokill = False)
 
         if collisions:
             Pulse(collisions[0].rect.center, 100, 750, "#FFE2E2", self.vfx_sprites)
             self.sfx["pickup"].play()
+
+            self.player.fish_count += 1
+            self.player.fish_count = min(self.player.fish_count, 3)
+
+            if self.player.fish_count == 3:
+                Pulse(self.player.rect.center, 1000, 2500, "green", self.vfx_sprites)
+
             self.fish_positions_states[collisions[0].number] = False
+            
             collisions[0].kill()
             self.fish_spawn_timer.start()
             self.pointers.pop(0)
@@ -208,6 +214,8 @@ class Game:
                 for pointer in self.pointers:
                     pointer.draw()
                     #print(pointer.angle)
+
+                self.fish_counter.update(self.player.fish_count)
 
                 self.display_surface.blit(self.pause_msg, (WINDOW_WIDTH - 185, WINDOW_HEIGHT - 35))
                     

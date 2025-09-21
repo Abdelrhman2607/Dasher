@@ -3,6 +3,7 @@ from statistics import mode, StatisticsError
 from timers import *
 from loaders import *
 from math import atan2, degrees
+from UI import FishCounter
 
 
 class Player(pygame.sprite.Sprite):
@@ -23,6 +24,8 @@ class Player(pygame.sprite.Sprite):
         self.animation_speed = 15
         self.frame_index = 0
         self.state = "front"
+
+        self.fish_count = 0
 
         self.dash_max_duration = 1500
         self.dash_speed = 1500
