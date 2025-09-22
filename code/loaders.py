@@ -1,12 +1,13 @@
 from settings import *
-from os import walk
+from os import walk, name
 from os.path import join
 
 def frames_loader(*path):
     #load surfaces into a dictionary with folder names as keys
+    OS_name = name
     frames = {}
     for folder_path, _folders, files in walk(join(*path)):
-        folder_name = folder_path.split('\\')[-1]
+        folder_name = folder_path.split('\\' if OS_name == "nt" else '/')[-1]
         frames[folder_name] = []
 
         for file in sorted(files, key = lambda name: int(name.split(".")[0])):
