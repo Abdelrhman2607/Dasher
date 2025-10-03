@@ -1,4 +1,5 @@
 from settings import *
+from loaders import *
 
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, x, y, image, ground, collide, groups):
@@ -19,5 +20,9 @@ class Fish(pygame.sprite.Sprite):
         self.number = number
 
 class Boss(pygame.sprite.Sprite):
-    pass
-        
+    def __init__(self, pos, groups):
+        super().__init__(groups)
+
+        self.frames = frames_loader("images", "boss")
+        self.image = self.frames["front"][0]
+        self.rect = self.image.get_frect(center = pos)
