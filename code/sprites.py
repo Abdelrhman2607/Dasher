@@ -38,30 +38,32 @@ class Boss(pygame.sprite.Sprite):
 
         self.idle_timer = Timer(duration = 5000,
                                 autostart = True,
+                                repeat = True,
                                 reusable = True,
                                 end_func = self.check_idle)
 
     def animate(self, dt, loop = False):
         
         if (self.frame_index == 0):
-            self.animating = True
             self.anim_length = len(self.frames[self.state])
+
+        self.frame_index += BOSS_ANIMS[self.state][0] * dt
+        if loop:
+            self.frame_index %= self.anim_length
 
         if (self.frame_index >= self.anim_length):
             if loop:
                 self.frame_index = 0
             else:
-                self.animating = False
+                self.state = self.previous_state
+                self.frame_index = 0
 
-        if self.animating:
-            self.frame_index = int(self.frame_index + BOSS_ANIMS[self.state][0] * dt)
-            self.frame_index %= self.anim_length
-            self.image = self.frames[self.state][self.frame_index]
+        self.image = self.frames[self.state][int(self.frame_index)]
 
 
     def check_idle(self):
         if self.state == "front":
-            self.state = choice(["stunned"])
+            self.state = choice(["lick", "blink", "fins"])
 
     def check_state(self):
         if self.state != self.last_frame_state:
@@ -76,6 +78,8 @@ class Boss(pygame.sprite.Sprite):
         self.check_state()
         self.idle_timer.update()
         self.animate(dt, BOSS_ANIMS[self.state][1])
+
+        self.last_frame_state = self.state
         print(self.state, self.last_frame_state, self.previous_state)
 
         
