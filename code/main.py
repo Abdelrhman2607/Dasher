@@ -90,7 +90,8 @@ class Game:
                 self.fish_positions.append(obj)
 
             elif obj.name == "boss":
-                Boss((obj.x,obj.y), self.all_sprites)    
+                self.boss = Boss((obj.x,obj.y), self.player, self.all_sprites) 
+                
 
     def bg_scroll(self, dt):
         self.display_surface.blit(self.bg, (self.bg_x,0))
