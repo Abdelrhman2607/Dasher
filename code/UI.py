@@ -170,6 +170,33 @@ class Pointer:
         #(self.anchor.centerx - self.pointer_width/2 - self.offset.x,self.anchor.centery - self.pointer_height/2 - self.offset.y)
         #pygame.draw.line(self.display_surf, "red", self.tracker.rect.center - self.offset, self.target_point - self.offset, 20)
 
+class BossPointer(Pointer):
+    def __init__(self, color, tracker, target_obj, camera_offset):
+
+        self.tracker = tracker
+        self.target = target_obj
+        self.offset = camera_offset
+        self.color = color
+
+        self.display_surf = pygame.display.get_surface()
+        self.original_pointer_surf = pygame.Surface((PLAYER_WIDTH, PLAYER_HEIGHT * 4), pygame.SRCALPHA)
+        self.pointer_width = self.original_pointer_surf.get_width()
+        self.pointer_height = self.original_pointer_surf.get_height()
+
+        self.pointer_surf = pygame.transform.rotozoom(self.original_pointer_surf, 0, 1)
+        self.anchor = self.tracker.rect
+
+        triangle_points = [(self.pointer_width / 6,self.pointer_height / 4),
+                           (self.pointer_width * 5/6, self.pointer_height / 4),
+                           (self.pointer_width/2, self.pointer_height / 6)]
+        
+        pygame.draw.polygon(self.original_pointer_surf, "black", triangle_points, 5)
+        pygame.draw.polygon(self.original_pointer_surf, self.color, triangle_points)
+
+    def update(self):
+        self.angle = round(degrees(atan2(self.target.rect.centery - self.anchor[1], -(self.target.rect.centerx - self.anchor[0]))))
+        self.rotate()
+
 class FishCounter:
     def __init__(self):
         self.display_surf = pygame.display.get_surface()

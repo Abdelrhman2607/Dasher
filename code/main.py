@@ -90,7 +90,8 @@ class Game:
                 self.fish_positions.append(obj)
 
             elif obj.name == "boss":
-                self.boss = Boss((obj.x,obj.y), self.player, self.all_sprites) 
+                self.boss = Boss((obj.x,obj.y), self.player, self.all_sprites)
+                self.pointers.append(BossPointer((92,32,66), self.player, self.boss, self.all_sprites.offset))
                 
 
     def bg_scroll(self, dt):
@@ -144,7 +145,7 @@ class Game:
             
             collisions[0].kill()
             self.fish_spawn_timer.start()
-            self.pointers.pop(0)
+            self.pointers.pop()
 
 
     def run(self):
