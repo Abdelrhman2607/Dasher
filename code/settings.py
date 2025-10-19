@@ -12,14 +12,15 @@ TILE_SIZE = 128
 PLAYER_HEIGHT = 108
 PLAYER_WIDTH = 49
 
-BOSS_ANIMS = { 
+BOSS_ANIMS = {  #speed, looping?
                 "front": [0, True],
                 "blink": [15, False],
                 "fins": [30, False],
-                "jump": [10, False],
+                "jump": [30, False],
                 "land": [10, False],
                 "lick": [20, False],
                 "stunned": [10, True],
                 "wake": [10, False],
-                "weaken": [10, False]
+                "weaken": [10, False],
+                "explosion": [30, False]
             }

@@ -38,14 +38,29 @@ class Boss(pygame.sprite.Sprite):
         self.frame_index = 0
         self.anim_length = 0
 
-        self.action_timer = Timer(duration = 3000,
+        self.jump_speed = -2000
+        self.dt = 0
+
+        self.idle_timer = Timer(duration = 3000,
                                 autostart = True,
                                 repeat = True,
                                 reusable = True,
-                                end_func = self.pick_action)
+                                end_func = self.pick_idle)
+        
+        self.jump_timer = Timer(duration = 10000,
+                                autostart = True,
+                                repeat = True,
+                                repeat_cd = 10000,
+                                reusable = True,
+                                end_func = self.jump)
+        
+        self.middair_timer = Timer(duration = 3000,
+                                reusable = True,
+                                end_func = self.land)
+        
+        self.timers = [self.idle_timer, self.jump_timer, self.middair_timer]
 
     def animate(self, dt, loop = False):
-        
         if (self.frame_index == 0):
             self.anim_length = len(self.frames[self.state])
 
@@ -62,10 +77,22 @@ class Boss(pygame.sprite.Sprite):
 
         self.image = self.frames[self.state][int(self.frame_index)]
 
+    def find_landing(self):
+        return pygame.Vector2(randint(3 * TILE_SIZE, 29 * TILE_SIZE), randint(3 * TILE_SIZE, 29 * TILE_SIZE)) 
 
-    def pick_action(self):
+    def jump(self):
+        if self.state != "jump":
+            self.state = "jump"
+            self.middair_timer.start()
+        
+        self.jump_dest = self.find_landing()
+    
+    def land(self):
+        self.rect.center = self.jump_dest
+
+    def pick_idle(self):
         if self.state == "front":
-            self.state = choice(["lick", "blink", "fins"])
+            self.state = choice(["lick", "blink"])
 
     def update_state(self):
         if self.state != self.last_frame_state:
@@ -77,11 +104,18 @@ class Boss(pygame.sprite.Sprite):
             self.previous_state = self.last_frame_state
 
     def update(self, dt):
+        self.dt = dt
+
+        if self.middair_timer.active:
+            self.rect.centery += self.jump_speed * self.dt
+
         self.update_state()
-        self.action_timer.update()
+        for timer in self.timers:
+            if self.middair_timer.active:
+                self.middair_timer.update()
+            else:
+                timer.update()
         self.animate(dt, BOSS_ANIMS[self.state][1])
 
         self.last_frame_state = self.state
-        #print(self.state, self.last_frame_state, self.previous_state)
-
         
