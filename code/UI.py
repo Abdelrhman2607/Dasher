@@ -206,17 +206,19 @@ class FishCounter:
         self.image = pygame.Surface((200,75), pygame.SRCALPHA)
         self.rect = self.image.get_frect(topleft = (10,10))
 
+    def draw(self):
+
+        self.image.fill((0, 0, 0, 0))
         pygame.draw.rect(self.image, "black", (0, 0, self.image.get_width(), self.image.get_height()), 0, 15)
         pygame.draw.rect(self.image, "white", (5, 5, self.image.get_width() - 10, self.image.get_height() - 10), 0, 10)
-
-    def draw(self):
-        self.display_surf.blit(self.image, self.rect)
 
         for i in range(self.fish_count):
             x = 35 + (i * self.radius * 2.5)
 
             pygame.draw.circle(self.image, self.circle_colors[self.fish_count - 1], (x, self.image.get_height()/2), self.radius)
-      
+        
+        self.display_surf.blit(self.image, self.rect)
+
     def update(self, fish_count):
         self.fish_count = fish_count
         self.draw()

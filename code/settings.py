@@ -17,10 +17,11 @@ BOSS_ANIMS = {  #speed, looping?
                 "blink": [15, False],
                 "fins": [30, False],
                 "jump": [30, False],
-                "land": [10, False],
+                "land": [30, False],
                 "lick": [20, False],
                 "stunned": [10, True],
-                "wake": [10, False],
-                "weaken": [10, False],
+                "stun_blink": [10, False],
+                "wake": [30, False],
+                "weaken": [30, False],
                 "explosion": [30, False]
             }
