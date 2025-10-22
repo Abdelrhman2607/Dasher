@@ -115,19 +115,20 @@ class Game:
                 self.state = "paused"
             
     def spawn_fish(self):
-        available_pos = [pos for pos in self.fish_positions if not(self.fish_positions_states[pos.number])]
-        
-        if not(available_pos):
-            return
-
-        else:    
-            fish_pos = choice(available_pos)
-            Fish((fish_pos.x, fish_pos.y), self.fish_img, fish_pos.number, self.fish_sprites)
-            self.fish_positions_states[fish_pos.number] = True
-
-            self.pointers.append(Pointer( "#FFE2E2", self.player, (fish_pos.x, fish_pos.y), self.all_sprites.offset))
-            # print(self.fish_positions_states)
-
+        if self.player.fish_count < 3:
+            available_pos = [pos for pos in self.fish_positions if not(self.fish_positions_states[pos.number])]
+            
+            if not(available_pos):
+                return
+    
+            else:    
+                fish_pos = choice(available_pos)
+                Fish((fish_pos.x, fish_pos.y), self.fish_img, fish_pos.number, self.fish_sprites)
+                self.fish_positions_states[fish_pos.number] = True
+    
+                self.pointers.append(Pointer( "#FFE2E2", self.player, (fish_pos.x, fish_pos.y), self.all_sprites.offset))
+                # print(self.fish_positions_states)
+    
     def fish_collision(self):
         collisions = pygame.sprite.spritecollide(self.player, self.fish_sprites, dokill = False)
 

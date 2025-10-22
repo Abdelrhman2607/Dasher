@@ -27,6 +27,7 @@ class Boss(pygame.sprite.Sprite):
         self.frames = frames_loader("images", "boss")
         self.image = self.frames["front"][0]
         self.rect = self.image.get_frect(center = pos)
+        self.group = groups
 
         self.player = player
 
@@ -38,6 +39,7 @@ class Boss(pygame.sprite.Sprite):
         self.frame_index = 0
         self.anim_length = 0
 
+        self.jump_dest = (0,0)
         self.jump_speed = -2000
         self.dt = 0
 
@@ -89,10 +91,21 @@ class Boss(pygame.sprite.Sprite):
     
     def land(self):
         self.rect.center = self.jump_dest
+        self.middair_timer.active = False
 
     def pick_idle(self):
         if self.state == "front":
             self.state = choice(["lick", "blink"])
+
+    def check_fish(self):
+        if self.player.fish_count == 3 and not(hasattr(self, "weak_boss")):
+            if self.middair_timer.active:
+                self.land()
+            for timer in self.timers:
+                timer.toggle_pause()
+            
+            self.image.fill((0,0,0,0))
+            self.weak_boss = WeakBoss(self.rect.center, self.player, self.group)
 
     def update_state(self):
         if self.state != self.last_frame_state:
@@ -109,6 +122,7 @@ class Boss(pygame.sprite.Sprite):
         if self.middair_timer.active:
             self.rect.centery += self.jump_speed * self.dt
 
+        self.check_fish()
         self.update_state()
         for timer in self.timers:
             if self.middair_timer.active:
@@ -119,3 +133,56 @@ class Boss(pygame.sprite.Sprite):
 
         self.last_frame_state = self.state
         
+
+class WeakBoss(pygame.sprite.Sprite):
+    def __init__(self, pos, player, groups):
+        super().__init__(groups)
+
+        self.frames = frames_loader("images", "boss")
+        self.image = self.frames["stunned"][0]
+        self.rect = self.image.get_frect(center = pos)
+
+        self.player = player
+        self.state = "weaken"
+
+        self.frame_index = 0
+        self.anim_length = 0
+
+        self.idle_timer = Timer(duration = 5000, repeat = True, end_func = lambda: setattr(self, "state", "stun_blink"))
+        
+    def weaken_anim(self, dt):
+        if self.frame_index == 0:
+            self.anim_length = len(self.frames[self.state])
+
+        if self.frame_index < self.anim_length - 1:
+            self.frame_index += BOSS_ANIMS[self.state][0] * dt
+        else:
+            self.idle_timer.start()
+            self.state = "stunned"
+            self.frame_index = 0
+
+    def idle_anim(self, dt):
+        if self.frame_index == 0:
+            self.anim_length = len(self.frames[self.state])
+
+        if self.frame_index < self.anim_length - 1:
+            self.frame_index += BOSS_ANIMS[self.state][0] * dt
+        else:
+            self.state = "stunned"
+            self.frame_index = 0
+
+    def update(self, dt):
+        self.idle_timer.update()
+
+        if self.state == "weaken":
+            self.weaken_anim(dt)
+            self.image = self.frames[self.state][int(self.frame_index)]
+
+        elif self.state == "stun_blink":
+            self.idle_anim(dt)
+            self.image = self.frames[self.state][int(self.frame_index)]
+
+        else:
+            self.image = self.frames[self.state][0]
+
+       

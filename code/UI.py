@@ -167,8 +167,6 @@ class Pointer:
         self.pointer_rect.x -= self.offset.x
         self.pointer_rect.y -= self.offset.y
         self.display_surf.blit(self.pointer_surf, self.pointer_rect)
-        #(self.anchor.centerx - self.pointer_width/2 - self.offset.x,self.anchor.centery - self.pointer_height/2 - self.offset.y)
-        #pygame.draw.line(self.display_surf, "red", self.tracker.rect.center - self.offset, self.target_point - self.offset, 20)
 
 class BossPointer(Pointer):
     def __init__(self, color, tracker, target_obj, camera_offset):
