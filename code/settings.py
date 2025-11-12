@@ -1,5 +1,6 @@
 import pygame
 from random import choice, randint
+from math import log, exp, atan2, degrees
 
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280,720
@@ -23,5 +24,5 @@ BOSS_ANIMS = {  #speed, looping?
                 "stun_blink": [20, False],
                 "wake": [30, False],
                 "weaken": [30, False],
-                "explosion": [30, False]
+                "explosion": [40, False]
             }

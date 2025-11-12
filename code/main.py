@@ -35,6 +35,7 @@ class Game:
         self.all_sprites = AllSprites()
         self.fish_sprites = AllSprites()
         self.vfx_sprites = AllSprites()
+        self.attack_sprites = AllSprites()
 
         self.pointers = []
         self.health_bars = []
@@ -207,6 +208,7 @@ class Game:
                 self.all_sprites.update(dt)
                 self.fish_sprites.update(dt)
                 self.vfx_sprites.update(dt)
+                self.attack_sprites.update(dt)
                 for pointer in self.pointers:
                     pointer.update()
 
@@ -219,6 +221,7 @@ class Game:
                 self.all_sprites.draw(target = self.player)
                 self.fish_sprites.draw(target = self.player)
                 self.vfx_sprites.draw(target = self.player)
+                self.attack_sprites.draw(target = self.player)
                 for pointer in self.pointers:
                     pointer.draw()
                 

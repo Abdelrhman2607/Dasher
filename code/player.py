@@ -44,7 +44,7 @@ class Player(pygame.sprite.Sprite):
                                 start_func = lambda: setattr(self, "dash_timer_started", True),
                                 end_func = lambda: setattr(self, "dash_timer_ended", True))
         
-        self.invul_timer = Timer(200, reusable = True)
+        self.invul_timer = Timer(500, reusable = True)
 
     def set_health(self, value):
         self.health = value
@@ -209,11 +209,23 @@ class Player(pygame.sprite.Sprite):
                     self.fish_count = 0
                     self.weak_boss = None
 
+    def attack_collision(self):
+        for sprite in self.game.attack_sprites:
+            if hasattr(sprite, "mask"):
+                self.mask = pygame.mask.from_surface(self.image)
+                if pygame.sprite.collide_mask(self, sprite) and not(self.invul_timer.active):
+                    self.set_health(self.health - sprite.damage)
+                    self.invul_timer.start()
+            else:
+                if self.hitbox.colliderect(sprite.rect) and not(self.invul_timer.active):
+                    self.set_health(self.health - sprite.damage)
+                    self.invul_timer.start()
+
     def update(self, dt):
-        
         self.input()
         
         self.move(dt)
+        self.attack_collision()
 
         self.animate(dt)
 

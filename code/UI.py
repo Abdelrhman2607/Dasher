@@ -1,5 +1,4 @@
 from settings import *
-from math import log, exp, atan2, degrees
 from timers import Timer
 
 class PauseMenu:
@@ -207,7 +206,7 @@ class HealthBar:
 
         self.frame_rect = pygame.FRect(pos[0], pos[1], self.length, self.height)
 
-        self.flash_timer = Timer(100, reusable = True,
+        self.flash_timer = Timer(200, reusable = True,
                                  start_func = lambda: setattr(self, "color", "red"),
                                  end_func = lambda: setattr(self, "color", self.base_color))
 
