@@ -146,6 +146,8 @@ class Game:
             if self.player.fish_count == 3:
                 Pulse(self.player.rect.center, 1000, 2500, "green", self.vfx_sprites)
 
+            self.player.set_health(self.player.health + 5)
+
             self.fish_positions_states[collisions[0].number] = False
             
             collisions[0].kill()
