@@ -7,7 +7,6 @@ from UI import *
 from sprites import *
 from pytmx.util_pygame import load_pygame
 
-#TODO add arrow outline
 class Game:                     
     def __init__(self):
         pygame.init()
@@ -38,6 +37,7 @@ class Game:
         self.vfx_sprites = AllSprites()
 
         self.pointers = []
+        self.health_bars = []
         self.fish_counter = FishCounter()
 
         self.dash_pulse_started = False
@@ -85,12 +85,16 @@ class Game:
             if obj.name == "player":
                 self.player_marker = obj
                 self.player = Player(self, (obj.x, obj.y), self.collision_sprites, self.all_sprites)
+                self.player_health_bar = HealthBar("pink", 100, 200, 30, (10, 90))
+                self.health_bars.append(self.player_health_bar)
         
             elif obj.name == "fish":
                 self.fish_positions.append(obj)
 
             elif obj.name == "boss":
-                self.boss = Boss((obj.x,obj.y), self.player, self.all_sprites)
+                self.boss = Boss(self, (obj.x,obj.y), self.player, self.all_sprites)
+                self.boss_health_bar = HealthBar((92,32,66), 100, 200, 30, (WINDOW_WIDTH - 210, 10))
+                self.health_bars.append(self.boss_health_bar)
                 self.pointers.append(BossPointer((92,32,66), self.player, self.boss, self.all_sprites.offset))
         
     def bg_scroll(self, dt):
@@ -146,7 +150,6 @@ class Game:
             collisions[0].kill()
             self.fish_spawn_timer.start()
             self.pointers.pop()
-
 
     def run(self):
         while self.running:
@@ -218,12 +221,16 @@ class Game:
                 self.vfx_sprites.draw(target = self.player)
                 for pointer in self.pointers:
                     pointer.draw()
-                    #print(pointer.angle)
+                
+                self.player_health_bar.update(self.player.health)
+                self.boss_health_bar.update(self.boss.health)
 
                 self.fish_counter.update(self.player.fish_count)
 
                 self.display_surface.blit(self.pause_msg, (WINDOW_WIDTH - 185, WINDOW_HEIGHT - 35))
-                    
+                
+                if self.boss.health <= 0 or self.player.health <= 0:
+                    self.running = False
                 # pygame.draw.rect(self.display_surface, "red", pygame.FRect(self.player_marker.x - self.all_sprites.offset.x, self.player_marker.y- self.all_sprites.offset.y, 5,5))
 
             elif self.state == "paused":

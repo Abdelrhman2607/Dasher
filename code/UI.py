@@ -1,5 +1,6 @@
 from settings import *
 from math import log, exp, atan2, degrees
+from timers import Timer
 
 class PauseMenu:
     def __init__(self, font_path, width, height, text_height, title, *messages):
@@ -194,6 +195,35 @@ class BossPointer(Pointer):
     def update(self):
         self.angle = round(degrees(atan2(self.target.rect.centery - self.anchor[1], -(self.target.rect.centerx - self.anchor[0]))))
         self.rotate()
+
+class HealthBar:
+    def __init__(self, color, max, length, height, pos):
+        self.display_surf = pygame.display.get_surface()
+        self.base_color = color
+        self.color = color
+        self.max = max
+        self.length = length
+        self.height = height
+
+        self.frame_rect = pygame.FRect(pos[0], pos[1], self.length, self.height)
+
+        self.flash_timer = Timer(100, reusable = True,
+                                 start_func = lambda: setattr(self, "color", "red"),
+                                 end_func = lambda: setattr(self, "color", self.base_color))
+
+    def draw(self, current_value):
+        pygame.draw.rect(self.display_surf, "black", self.frame_rect, 0, 15)
+        pygame.draw.rect(self.display_surf, "white", self.frame_rect.inflate(-10,-10), 0, 15)
+
+        self.health_rect = pygame.FRect(self.frame_rect.left + 10, self.frame_rect.top + 10, (current_value/self.max)*(self.length - 20), self.height - 20)
+        pygame.draw.rect(self.display_surf, self.color, self.health_rect, 0, 5)
+
+    def flash(self):
+        self.flash_timer.start()
+
+    def update(self, current_value):
+        self.draw(current_value)
+        self.flash_timer.update()
 
 class FishCounter:
     def __init__(self):

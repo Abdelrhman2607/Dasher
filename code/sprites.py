@@ -19,16 +19,18 @@ class Fish(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(center = pos)
 
         self.number = number
-#TODO fix boss visibility after weak boss hit
+
 class Boss(pygame.sprite.Sprite):
-    def __init__(self, pos, player, groups):
+    def __init__(self, game, pos, player, groups):
         super().__init__(groups)
+        self.game = game
         
         self.frames = frames_loader("images", "boss")
         self.image = self.frames["front"][0]
         self.rect = self.image.get_frect(center = pos)
         self.group = groups
 
+        self.health = 100
         player.boss = self
         self.player = player
         self.hidden = False
@@ -64,6 +66,10 @@ class Boss(pygame.sprite.Sprite):
                                 end_func = self.land)
         
         self.timers = [self.idle_timer, self.jump_timer, self.middair_timer]
+
+    def set_health(self, value):
+        self.health = value
+        self.game.boss_health_bar.flash()
 
     def animate(self, dt, loop = False):
         if (self.frame_index == 0):
@@ -179,11 +185,14 @@ class WeakBoss(pygame.sprite.Sprite):
             self.frame_index = 0
 
     def get_hit(self):
+        self.boss.set_health(self.boss.health - 34)
+        self.player.invul_timer.start()
         self.boss.image = self.boss.frames["front"][0]
         self.boss.hidden = False
         self.boss.weak_boss = None
         for timer in self.boss.timers:
                 timer.toggle_pause()
+        self.boss.jump()
         
         self.kill()
 

@@ -19,6 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(center = pos)
         self.hitbox = self.rect.inflate(-30,-90)
 
+        self.health = 100
         self.previous_directions = []
         self.direction = pygame.Vector2()
         self.speed = 300
@@ -42,6 +43,12 @@ class Player(pygame.sprite.Sprite):
                                 reusable = True,
                                 start_func = lambda: setattr(self, "dash_timer_started", True),
                                 end_func = lambda: setattr(self, "dash_timer_ended", True))
+        
+        self.invul_timer = Timer(200, reusable = True)
+
+    def set_health(self, value):
+        self.health = value
+        self.game.player_health_bar.flash()
 
     def animate(self, dt):
         if self.state == "dashing":
@@ -166,7 +173,7 @@ class Player(pygame.sprite.Sprite):
 
     def boss_collision(self, direction, delta):
         sprite = self.boss
-        if self.hitbox.colliderect(sprite.rect):
+        if self.hitbox.colliderect(sprite.rect) and not(sprite.middair_timer.active):
             if (direction == "X"):
                 if (delta > 0):
                     self.hitbox.right = sprite.rect.left
@@ -177,6 +184,9 @@ class Player(pygame.sprite.Sprite):
                     self.hitbox.bottom = sprite.rect.top
                 elif (delta < 0):
                     self.hitbox.top = sprite.rect.bottom
+            if not(self.invul_timer.active):
+                self.invul_timer.start()
+                self.set_health(self.health - 5)
 
     def weak_boss_collision(self, direction, delta):
         if self.weak_boss: #weak doesn't exist yet
@@ -208,6 +218,6 @@ class Player(pygame.sprite.Sprite):
         self.animate(dt)
 
         self.dash_timer.update()
-
+        self.invul_timer.update()
 
         
