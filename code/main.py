@@ -84,7 +84,7 @@ class Game:
         for obj in self.map.get_layer_by_name("positions"):
             if obj.name == "player":
                 self.player_marker = obj
-                self.player = Player((obj.x, obj.y), self.collision_sprites, self.all_sprites)
+                self.player = Player(self, (obj.x, obj.y), self.collision_sprites, self.all_sprites)
         
             elif obj.name == "fish":
                 self.fish_positions.append(obj)

@@ -19,7 +19,7 @@ class Fish(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(center = pos)
 
         self.number = number
-
+#TODO fix boss visibility after weak boss hit
 class Boss(pygame.sprite.Sprite):
     def __init__(self, pos, player, groups):
         super().__init__(groups)
@@ -31,6 +31,8 @@ class Boss(pygame.sprite.Sprite):
 
         player.boss = self
         self.player = player
+        self.hidden = False
+        self.weak_boss = None
 
         self.state = "front"
         self.previous_state = "front"
@@ -99,14 +101,14 @@ class Boss(pygame.sprite.Sprite):
             self.state = choice(["lick", "blink"])
 
     def check_fish(self):
-        if self.player.fish_count == 3 and not(hasattr(self, "weak_boss")):
+        if self.player.fish_count == 3 and self.weak_boss == None:
             if self.middair_timer.active:
                 self.land()
             for timer in self.timers:
                 timer.toggle_pause()
             
-            self.image.fill((0,0,0,0))
-            self.weak_boss = WeakBoss(self.rect.center, self.player, self.group)
+            self.hidden = True
+            self.weak_boss = WeakBoss(self, self.rect.center, self.player, self.group)
 
     def update_state(self):
         if self.state != self.last_frame_state:
@@ -130,13 +132,14 @@ class Boss(pygame.sprite.Sprite):
                 self.middair_timer.update()
             else:
                 timer.update()
-        self.animate(dt, BOSS_ANIMS[self.state][1])
+        if not(self.hidden):
+            self.animate(dt, BOSS_ANIMS[self.state][1])
 
         self.last_frame_state = self.state
         
 
 class WeakBoss(pygame.sprite.Sprite):
-    def __init__(self, pos, player, groups):
+    def __init__(self, boss, pos, player, groups):
         super().__init__(groups)
 
         self.frames = frames_loader("images", "boss")
@@ -144,6 +147,7 @@ class WeakBoss(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(center = pos)
 
         player.weak_boss = self
+        self.boss = boss
         self.player = player
 
         self.state = "weaken"
@@ -173,6 +177,15 @@ class WeakBoss(pygame.sprite.Sprite):
         else:
             self.state = "stunned"
             self.frame_index = 0
+
+    def get_hit(self):
+        self.boss.image = self.boss.frames["front"][0]
+        self.boss.hidden = False
+        self.boss.weak_boss = None
+        for timer in self.boss.timers:
+                timer.toggle_pause()
+        
+        self.kill()
 
     def update(self, dt):
         self.idle_timer.update()

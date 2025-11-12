@@ -38,6 +38,9 @@ class AllSprites(pygame.sprite.Group):
         self.normal_sprites = []
 
         for sprite in self:
+            if hasattr(sprite, "hidden"):
+                if sprite.hidden:
+                    continue
             if hasattr(sprite, "ground") and  sprite.ground:
                 self.ground_sprites.append(sprite)
 

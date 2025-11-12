@@ -4,11 +4,13 @@ from timers import *
 from loaders import *
 from math import atan2, degrees
 from UI import FishCounter
+from vfx import Pulse
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, collision_sprites, groups):
+    def __init__(self, game, pos, collision_sprites, groups):
         super().__init__(groups)
+        self.game = game
         self.col_sprites = [sprite for sprite in collision_sprites if sprite.collide]
 
         self.frames = frames_loader("images", "player")
@@ -127,13 +129,17 @@ class Player(pygame.sprite.Sprite):
 
         self.hitbox.centerx += dx
         if abs(dx) > 0.5:
+            self.weak_boss_collision("X", dx)
             self.collision("X", dx)
             self.boss_collision("X", dx)
             
+            
         self.hitbox.centery += dy
         if abs(dy) > 0.5:
+            self.weak_boss_collision("Y", dy)
             self.collision("Y", dy)
             self.boss_collision("Y", dy)
+            
 
         self.rect.center = self.hitbox.center
 
@@ -159,23 +165,39 @@ class Player(pygame.sprite.Sprite):
                         self.hitbox.top = sprite.rect.bottom
 
     def boss_collision(self, direction, delta):
-        for sprite in [self.boss, self.weak_boss]:
-            if sprite == None:
-                continue
-            
+        sprite = self.boss
+        if self.hitbox.colliderect(sprite.rect):
+            if (direction == "X"):
+                if (delta > 0):
+                    self.hitbox.right = sprite.rect.left
+                elif (delta < 0):
+                    self.hitbox.left = sprite.rect.right
+            if (direction == "Y"):
+                if (delta > 0):
+                    self.hitbox.bottom = sprite.rect.top
+                elif (delta < 0):
+                    self.hitbox.top = sprite.rect.bottom
+
+    def weak_boss_collision(self, direction, delta):
+        if self.weak_boss: #weak doesn't exist yet
+            sprite = self.weak_boss
             if self.hitbox.colliderect(sprite.rect):
-                    if (direction == "X"):
-                        if (delta > 0):
-                            self.hitbox.right = sprite.rect.left
-                        elif (delta < 0):
-                            self.hitbox.left = sprite.rect.right
-                    if (direction == "Y"):
-                        if (delta > 0):
-                            self.hitbox.bottom = sprite.rect.top
-                        elif (delta < 0):
-                            self.hitbox.top = sprite.rect.bottom
-            if sprite == self.weak_boss:
-                pass
+                if (direction == "X"):
+                    if (delta > 0):
+                        self.hitbox.right = sprite.rect.left
+                    elif (delta < 0):
+                        self.hitbox.left = sprite.rect.right
+                if (direction == "Y"):
+                    if (delta > 0):
+                        self.hitbox.bottom = sprite.rect.top
+                    elif (delta < 0):
+                        self.hitbox.top = sprite.rect.bottom
+                if self.state == "dashing":        
+                    Pulse(self.rect.center, 2000, 2000, (92,32,66), self.game.vfx_sprites)
+                    self.game.all_sprites.screen_shake(300, 250)
+                    sprite.get_hit()
+                    self.fish_count = 0
+                    self.weak_boss = None
 
     def update(self, dt):
         
