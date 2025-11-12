@@ -85,15 +85,14 @@ class Game:
             if obj.name == "player":
                 self.player_marker = obj
                 self.player = Player((obj.x, obj.y), self.collision_sprites, self.all_sprites)
-
+        
             elif obj.name == "fish":
                 self.fish_positions.append(obj)
 
             elif obj.name == "boss":
                 self.boss = Boss((obj.x,obj.y), self.player, self.all_sprites)
                 self.pointers.append(BossPointer((92,32,66), self.player, self.boss, self.all_sprites.offset))
-                
-
+        
     def bg_scroll(self, dt):
         self.display_surface.blit(self.bg, (self.bg_x,0))
         self.display_surface.blit(self.bg, (self.bg_x - WINDOW_WIDTH,0))

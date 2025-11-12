@@ -23,12 +23,13 @@ class Fish(pygame.sprite.Sprite):
 class Boss(pygame.sprite.Sprite):
     def __init__(self, pos, player, groups):
         super().__init__(groups)
-
+        
         self.frames = frames_loader("images", "boss")
         self.image = self.frames["front"][0]
         self.rect = self.image.get_frect(center = pos)
         self.group = groups
 
+        player.boss = self
         self.player = player
 
         self.state = "front"
@@ -142,7 +143,9 @@ class WeakBoss(pygame.sprite.Sprite):
         self.image = self.frames["stunned"][0]
         self.rect = self.image.get_frect(center = pos)
 
+        player.weak_boss = self
         self.player = player
+
         self.state = "weaken"
 
         self.frame_index = 0

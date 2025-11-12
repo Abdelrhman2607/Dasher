@@ -25,6 +25,9 @@ class Player(pygame.sprite.Sprite):
         self.frame_index = 0
         self.state = "front"
 
+        self.boss = None
+        self.weak_boss = None
+
         self.fish_count = 0
 
         self.dash_max_duration = 1500
@@ -125,10 +128,12 @@ class Player(pygame.sprite.Sprite):
         self.hitbox.centerx += dx
         if abs(dx) > 0.5:
             self.collision("X", dx)
+            self.boss_collision("X", dx)
             
         self.hitbox.centery += dy
         if abs(dy) > 0.5:
             self.collision("Y", dy)
+            self.boss_collision("Y", dy)
 
         self.rect.center = self.hitbox.center
 
@@ -152,6 +157,25 @@ class Player(pygame.sprite.Sprite):
                         self.hitbox.bottom = sprite.rect.top
                     elif (delta < 0):
                         self.hitbox.top = sprite.rect.bottom
+
+    def boss_collision(self, direction, delta):
+        for sprite in [self.boss, self.weak_boss]:
+            if sprite == None:
+                continue
+            
+            if self.hitbox.colliderect(sprite.rect):
+                    if (direction == "X"):
+                        if (delta > 0):
+                            self.hitbox.right = sprite.rect.left
+                        elif (delta < 0):
+                            self.hitbox.left = sprite.rect.right
+                    if (direction == "Y"):
+                        if (delta > 0):
+                            self.hitbox.bottom = sprite.rect.top
+                        elif (delta < 0):
+                            self.hitbox.top = sprite.rect.bottom
+            if sprite == self.weak_boss:
+                pass
 
     def update(self, dt):
         
