@@ -119,7 +119,7 @@ class Boss(pygame.sprite.Sprite):
 
     def pick_idle(self):
         if self.state == "front":
-            self.state = choice(["lick", "blink"])
+            self.state = choice(["lick", "blink", "fins"])
 
     def check_fish(self):
         if self.player.fish_count == 3 and self.weak_boss == None:
