@@ -16,6 +16,7 @@ class Game:
         self.running = True
 
         self.font_path = join("data", "fonts", "DroplineRegular-Wpegz.otf")
+        self.title_font = pygame.font.Font(self.font_path, 50)
         self.pause_msg_font = pygame.font.Font(self.font_path, 25)
         self.pause_msg = self.pause_msg_font.render("Press 'P' to pause", True, "black")
 
@@ -24,9 +25,14 @@ class Game:
         
         self.start_menu = StartMenu(self.font_path)
         self.logo = pygame.image.load(join("images", "logo.png")).convert_alpha()
+
         self.bg = pygame.image.load(join("images", "bg.png")).convert_alpha()
         self.bg_speed = 25
         self.bg_x = 0
+
+        self.lose_bg = pygame.image.load(join("images", "lose.png")).convert_alpha()
+        self.lose_bg_speed = 150
+        self.lose_bg_y = -WINDOW_HEIGHT
 
         self.pause_menu = PauseMenu(self.font_path, 500, 200 , 30, "PAUSED", "Press 'P' to unpause", "BGM volume:", "SFX volume:")
         self.bgm_volume_slider = Slider((self.pause_menu.rect.left + 200, self.pause_menu.rect.centery + 25), 250, 0, 1)
@@ -45,19 +51,27 @@ class Game:
 
         self.collision_sprites = []
 
-        self.fish_img = pygame.image.load(join("images", "power-ups", "fish.png"))
+        self.fish_img = pygame.image.load(join("images", "power-ups", "fish.png")).convert_alpha()
         self.fish_positions = []
         self.fish_spawn_timer = Timer(duration = 5000,
                                       end_func = self.spawn_fish)
 
         self.audio = audio_loader("audio")
         self.bgm = self.audio["bgm"]
+        self.explosion_sfx = [self.audio["explosion1"], self.audio["explosion2"], self.audio["explosion3"]]
         self.sfx = {
             "dash": self.audio["dash"],
             "pulse": self.audio["pulse"],
-            "pickup": self.audio["pickup"]
+            "pickup": self.audio["pickup"],
+            "explosion1": self.audio["explosion1"],
+            "explosion2": self.audio["explosion2"],
+            "explosion3": self.audio["explosion3"]
         }
-        
+        self.win_bg = pygame.image.load(join("images", "win_bg.png")).convert_alpha()
+        self.win_frame_index = 0
+        self.win_anim_speed = 10
+        self.win_frames = frames_loader("images", "win")
+        self.win_anim_length = len(self.win_frames)
         self.setup()
         
         self.fish_positions_states = [False] * len(self.fish_positions)
@@ -93,7 +107,7 @@ class Game:
                 self.fish_positions.append(obj)
 
             elif obj.name == "boss":
-                self.boss = Boss(self, (obj.x,obj.y), self.player, self.all_sprites)
+                self.boss = Boss(self, (obj.x,obj.y), self.player, self.explosion_sfx, self.all_sprites)
                 self.boss_health_bar = HealthBar((92,32,66), 100, 200, 30, (WINDOW_WIDTH - 210, 10))
                 self.health_bars.append(self.boss_health_bar)
                 self.pointers.append(BossPointer((92,32,66), self.player, self.boss, self.all_sprites.offset))
@@ -117,6 +131,11 @@ class Game:
             else:
                 self.previous_state = self.state 
                 self.state = "paused"
+
+        if pressed_keys[pygame.K_r] and self.state == "lose":
+            self.audio["scrape"].stop()
+            self = Game()
+            self.run()
             
     def spawn_fish(self):
         if self.player.fish_count < 3:
@@ -234,8 +253,14 @@ class Game:
 
                 self.display_surface.blit(self.pause_msg, (WINDOW_WIDTH - 185, WINDOW_HEIGHT - 35))
                 
-                if self.boss.health <= 0 or self.player.health <= 0:
-                    self.running = False
+                if self.player.health <= 0:
+                    self.state = "lose"
+                    self.bgm.fadeout(200)
+                    self.audio["scrape"].play()
+
+                elif self.boss.health <= 0:
+                    self.state = "win"
+                    self.audio["win"].play()
                 # pygame.draw.rect(self.display_surface, "red", pygame.FRect(self.player_marker.x - self.all_sprites.offset.x, self.player_marker.y- self.all_sprites.offset.y, 5,5))
 
             elif self.state == "paused":
@@ -247,7 +272,25 @@ class Game:
                 self.sfx_volume_slider.update()
                 for sound in self.sfx.keys():
                     self.sfx[sound].set_volume(self.sfx_volume_slider.magnitude)
-                
+            
+            elif self.state == "lose":
+                self.display_surface.blit(self.lose_bg, (0, self.lose_bg_y))
+                if self.lose_bg_y < 0:
+                    self.lose_bg_y += dt * self.lose_bg_speed
+                elif self.lose_bg_y >= 0:
+                    self.lose_bg_y = 0
+                    self.display_surface.blit(self.title_font.render("GAME OVER", True, "black"), (WINDOW_WIDTH/2 - 100, 20))
+                    self.display_surface.blit(self.title_font.render("Press 'R' to retry", True, "black"), (WINDOW_WIDTH/2 - 150, WINDOW_HEIGHT-100))
+
+            elif self.state == "win":
+                self.win_frame_index += int(dt * self.win_anim_speed)
+                if self.win_frame_index <= self.win_anim_length:
+                    self.display_surface.blit(self.win_frames[self.win_frame_index])
+                else:
+                    self.display_surface.blit(self.win_bg, (0,0))
+                    self.display_surface.blit(self.title_font.render("Press 'R' to retry", True, "black"), (WINDOW_WIDTH/2 - 150, WINDOW_HEIGHT/2))
+
+            #TODO add win win_bg, win audio, win frames
             self.menu_input()
             pygame.display.update()
 

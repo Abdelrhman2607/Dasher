@@ -22,7 +22,7 @@ class Fish(pygame.sprite.Sprite):
         self.number = number
 
 class Boss(pygame.sprite.Sprite):
-    def __init__(self, game, pos, player, groups):
+    def __init__(self, game, pos, player, explosions, groups):
         super().__init__(groups)
         self.game = game
 
@@ -30,6 +30,7 @@ class Boss(pygame.sprite.Sprite):
         self.image = self.frames["front"][0]
         self.rect = self.image.get_frect(center = pos)
         self.group = groups
+        self.explosion_sfx = explosions
 
         self.health = 100
         player.boss = self
@@ -139,6 +140,7 @@ class Boss(pygame.sprite.Sprite):
         for pulse in self.warning_pulses:
             if pulse.radius >= pulse.max_radius:
                 Explosion(self.frames["explosion"], pulse.rect.center, self.game.attack_sprites)
+                choice(self.explosion_sfx).play()
                 self.warning_pulses.remove(pulse)
 
     def attack_spike(self):
@@ -180,7 +182,7 @@ class Spike(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(center = pos)
         
         self.speed = 1500
-        self.damage = 15
+        self.damage = 10
 
         self.target = target.rect.center
         self.angle = round(degrees(atan2(self.target[1] - self.rect.center[1], -(self.target[0] - self.rect.center[0]))))
