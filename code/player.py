@@ -47,7 +47,7 @@ class Player(pygame.sprite.Sprite):
         self.invul_timer = Timer(500, reusable = True)
 
     def set_health(self, value):
-        self.health = value
+        self.health = min(100, value)
         self.game.player_health_bar.flash()
 
     def animate(self, dt):

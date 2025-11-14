@@ -101,8 +101,10 @@ class Boss(pygame.sprite.Sprite):
             else:
                 self.state = self.previous_state
                 self.frame_index = 0
-
-        self.image = self.frames[self.state][int(self.frame_index)]
+        try:
+            self.image = self.frames[self.state][int(self.frame_index)]
+        except IndexError:
+            self.image = self.frames["front"][0]
 
     def find_landing(self):
         return pygame.Vector2(randint(3 * TILE_SIZE, 29 * TILE_SIZE), randint(3 * TILE_SIZE, 29 * TILE_SIZE)) 

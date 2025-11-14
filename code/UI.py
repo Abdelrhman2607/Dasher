@@ -49,7 +49,8 @@ class PauseMenu:
         pass
 
 class StartMenu:
-    def __init__(self, font_path):
+    def __init__(self, game, font_path):
+        self.game = game
         self.font = pygame.font.Font(font_path, 50)
         self.display_surf = pygame.display.get_surface()
         self.active = True
@@ -65,6 +66,7 @@ class StartMenu:
         keys = pygame.key.get_just_pressed()
 
         if keys[pygame.K_RETURN]:
+            self.game.start_time = pygame.time.get_ticks()
             self.active = False
 
 class Slider:

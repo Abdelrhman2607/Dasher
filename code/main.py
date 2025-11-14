@@ -10,6 +10,8 @@ from pytmx.util_pygame import load_pygame
 class Game:                     
     def __init__(self):
         pygame.init()
+        pygame.mixer.set_num_channels(16)
+
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption("Dasher")
         self.clock = pygame.time.Clock()
@@ -23,7 +25,7 @@ class Game:
         self.state = "start"
         self.previous_state = "start"
         
-        self.start_menu = StartMenu(self.font_path)
+        self.start_menu = StartMenu(self, self.font_path)
         self.logo = pygame.image.load(join("images", "logo.png")).convert_alpha()
 
         self.bg = pygame.image.load(join("images", "bg.png")).convert_alpha()
@@ -67,11 +69,13 @@ class Game:
             "explosion2": self.audio["explosion2"],
             "explosion3": self.audio["explosion3"]
         }
-        self.win_bg = pygame.image.load(join("images", "win_bg.png")).convert_alpha()
+    
         self.win_frame_index = 0
-        self.win_anim_speed = 10
+        self.win_anim_speed = 25
+        self.win_audio = self.audio["win"]
         self.win_frames = frames_loader("images", "win")
-        self.win_anim_length = len(self.win_frames)
+        self.win_anim_length = len(self.win_frames["win"])
+        print(self.win_anim_length)
         self.setup()
         
         self.fish_positions_states = [False] * len(self.fish_positions)
@@ -156,22 +160,19 @@ class Game:
         collisions = pygame.sprite.spritecollide(self.player, self.fish_sprites, dokill = False)
 
         if collisions:
-            Pulse(collisions[0].rect.center, 100, 750, "#FFE2E2", self.vfx_sprites)
-            self.sfx["pickup"].play()
+            for fish in collisions:
+                Pulse(fish.rect.center, 100, 750, "#FFE2E2", self.vfx_sprites)
+                self.sfx["pickup"].play()
 
-            self.player.fish_count += 1
-            self.player.fish_count = min(self.player.fish_count, 3)
+                self.fish_positions_states[fish.number] = False
 
-            if self.player.fish_count == 3:
-                Pulse(self.player.rect.center, 1000, 2500, "green", self.vfx_sprites)
-
-            self.player.set_health(self.player.health + 10)
-
-            self.fish_positions_states[collisions[0].number] = False
-            
-            collisions[0].kill()
-            self.fish_spawn_timer.start()
-            self.pointers.pop()
+                self.player.fish_count = min(self.player.fish_count + 1, 3)
+                self.player.set_health(self.player.health + 10)
+                
+                fish.kill()
+                self.fish_spawn_timer.start()
+                if self.pointers:
+                    self.pointers.pop()
 
     def run(self):
         while self.running:
@@ -260,7 +261,8 @@ class Game:
 
                 elif self.boss.health <= 0:
                     self.state = "win"
-                    self.audio["win"].play()
+                    self.elapsed_time = round(((pygame.time.get_ticks() - self.start_time)/1000), 2)
+                    self.win_audio.play()
                 # pygame.draw.rect(self.display_surface, "red", pygame.FRect(self.player_marker.x - self.all_sprites.offset.x, self.player_marker.y- self.all_sprites.offset.y, 5,5))
 
             elif self.state == "paused":
@@ -283,14 +285,14 @@ class Game:
                     self.display_surface.blit(self.title_font.render("Press 'R' to retry", True, "black"), (WINDOW_WIDTH/2 - 150, WINDOW_HEIGHT-100))
 
             elif self.state == "win":
-                self.win_frame_index += int(dt * self.win_anim_speed)
+                self.win_frame_index += dt * self.win_anim_speed
                 if self.win_frame_index <= self.win_anim_length:
-                    self.display_surface.blit(self.win_frames[self.win_frame_index])
+                    self.display_surface.blit(self.win_frames["win"][int(self.win_frame_index)], (0,0))
                 else:
-                    self.display_surface.blit(self.win_bg, (0,0))
-                    self.display_surface.blit(self.title_font.render("Press 'R' to retry", True, "black"), (WINDOW_WIDTH/2 - 150, WINDOW_HEIGHT/2))
+                    self.display_surface.blit(self.title_font.render("You Win", True, "black"), (WINDOW_WIDTH/2 - 50, 100))
+                    self.display_surface.blit(self.title_font.render(f"Time: {self.elapsed_time} seconds", True, "black"), (WINDOW_WIDTH/2 - 150, 300))
+                    self.display_surface.blit(self.title_font.render("Press 'R' to retry", True, "black"), (WINDOW_WIDTH/2 - 125, WINDOW_HEIGHT - 300))
 
-            #TODO add win win_bg, win audio, win frames
             self.menu_input()
             pygame.display.update()
 
