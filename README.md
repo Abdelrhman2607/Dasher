@@ -5,7 +5,11 @@
 * Krita
 * Inno Setup Compiler
 
+## How to play:
 
+* AWSD to move
+* Space to dash
+* Collect fish to power up and attack the boss
 
 ## Audio sourced from Pixabay:
 
