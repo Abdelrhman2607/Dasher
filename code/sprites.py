@@ -285,11 +285,17 @@ class WeakBoss(pygame.sprite.Sprite):
 
         if self.state == "weaken":
             self.weaken_anim(dt)
-            self.image = self.frames[self.state][int(self.frame_index)]
+            try:
+                self.image = self.frames[self.state][int(self.frame_index)]
+            except IndexError:
+                self.image = self.frames[self.state][0]
 
         elif self.state == "stun_blink":
             self.idle_anim(dt)
-            self.image = self.frames[self.state][int(self.frame_index)]
+            try:
+                self.image = self.frames[self.state][int(self.frame_index)]
+            except IndexError:
+                self.image = self.frames[self.state][0]
 
         else:
             self.image = self.frames[self.state][0]
