@@ -149,7 +149,7 @@ class Game:
             if not(available_pos):
                 return
     
-            else:    
+            else:
                 fish_pos = choice(available_pos)
                 Fish((fish_pos.x, fish_pos.y), self.fish_img, fish_pos.number, self.fish_sprites)
                 self.fish_positions_states[fish_pos.number] = True
@@ -193,7 +193,6 @@ class Game:
                     self.bgm.play(-1)
 
             elif self.state == "running":
-
                 if self.player.state == "dashing" and not(hasattr(self, "dash_trail_timer")):
                     #create an after image every {duration} seconds if dashing and not already being created
                     self.dash_trail_timer = Timer(duration = 50,

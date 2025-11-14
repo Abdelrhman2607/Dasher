@@ -207,6 +207,8 @@ class Player(pygame.sprite.Sprite):
                     self.game.all_sprites.screen_shake(300, 250)
                     sprite.get_hit()
                     self.fish_count = 0
+                    if not(self.game.fish_spawn_timer.active):
+                        self.game.fish_spawn_timer.start()
                     self.weak_boss = None
 
     def attack_collision(self):
