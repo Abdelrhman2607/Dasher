@@ -13,6 +13,7 @@ class Game:
         pygame.mixer.set_num_channels(16)
 
         self.display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        pygame.display.set_icon(pygame.image.load(resource_path(join("icon.ico"))).convert_alpha())
         pygame.display.set_caption("Dasher")
         self.clock = pygame.time.Clock()
         self.running = True
