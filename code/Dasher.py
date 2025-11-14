@@ -17,6 +17,7 @@ class Game:
         pygame.display.set_caption("Dasher")
         self.clock = pygame.time.Clock()
         self.running = True
+        self.restart = False
 
         self.font_path = join("data", "fonts", "DroplineRegular-Wpegz.otf")
         self.title_font = pygame.font.Font(self.font_path, 50)
@@ -140,8 +141,9 @@ class Game:
         if pressed_keys[pygame.K_r]:
             if self.state == "lose" or self.state == "win":
                 self.audio["scrape"].stop()
-                self = Game()
-                self.run()
+                self.running = False
+                self.restart = True
+                
             
     def spawn_fish(self):
         if self.player.fish_count < 3:
@@ -182,6 +184,7 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                    self.restart = False
 
             if self.state == "start":
                 self.bg_scroll(dt)
@@ -302,4 +305,8 @@ class Game:
 
 if __name__ == '__main__':
     game = Game()
-    game.run()
+    while True:
+        game.run()
+        if not(game.restart):
+            break
+        game = Game()
