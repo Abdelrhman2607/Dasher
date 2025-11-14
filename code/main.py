@@ -75,7 +75,7 @@ class Game:
         self.win_audio = self.audio["win"]
         self.win_frames = frames_loader("images", "win")
         self.win_anim_length = len(self.win_frames["win"])
-        print(self.win_anim_length)
+        
         self.setup()
         
         self.fish_positions_states = [False] * len(self.fish_positions)
