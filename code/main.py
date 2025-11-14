@@ -26,13 +26,13 @@ class Game:
         self.previous_state = "start"
         
         self.start_menu = StartMenu(self, self.font_path)
-        self.logo = pygame.image.load(join("images", "logo.png")).convert_alpha()
+        self.logo = pygame.image.load(resource_path(join("images", "logo.png"))).convert_alpha()
 
-        self.bg = pygame.image.load(join("images", "bg.png")).convert_alpha()
+        self.bg = pygame.image.load(resource_path(join("images", "bg.png"))).convert_alpha()
         self.bg_speed = 25
         self.bg_x = 0
 
-        self.lose_bg = pygame.image.load(join("images", "lose.png")).convert_alpha()
+        self.lose_bg = pygame.image.load(resource_path(join("images", "lose.png"))).convert_alpha()
         self.lose_bg_speed = 150
         self.lose_bg_y = -WINDOW_HEIGHT
 
@@ -53,7 +53,7 @@ class Game:
 
         self.collision_sprites = []
 
-        self.fish_img = pygame.image.load(join("images", "power-ups", "fish.png")).convert_alpha()
+        self.fish_img = pygame.image.load(resource_path(join("images", "power-ups", "fish.png"))).convert_alpha()
         self.fish_positions = []
         self.fish_spawn_timer = Timer(duration = 5000,
                                       end_func = self.spawn_fish)
@@ -82,7 +82,7 @@ class Game:
         self.spawn_fish()
 
     def setup(self):
-        self.map = load_pygame(join("data", "map", "map.tmx"))
+        self.map = load_pygame(resource_path(join("data", "map", "map.tmx")))
 
         for x, y, image in self.map.get_layer_by_name("ground").tiles():
             Sprite(x * TILE_SIZE, y * TILE_SIZE, image, True, False, self.all_sprites)
@@ -136,10 +136,11 @@ class Game:
                 self.previous_state = self.state 
                 self.state = "paused"
 
-        if pressed_keys[pygame.K_r] and self.state == "lose":
-            self.audio["scrape"].stop()
-            self = Game()
-            self.run()
+        if pressed_keys[pygame.K_r]:
+            if self.state == "lose" or self.state == "win":
+                self.audio["scrape"].stop()
+                self = Game()
+                self.run()
             
     def spawn_fish(self):
         if self.player.fish_count < 3:
@@ -261,6 +262,7 @@ class Game:
 
                 elif self.boss.health <= 0:
                     self.state = "win"
+                    self.bgm.fadeout(200)
                     self.elapsed_time = round(((pygame.time.get_ticks() - self.start_time)/1000), 2)
                     self.win_audio.play()
                 # pygame.draw.rect(self.display_surface, "red", pygame.FRect(self.player_marker.x - self.all_sprites.offset.x, self.player_marker.y- self.all_sprites.offset.y, 5,5))

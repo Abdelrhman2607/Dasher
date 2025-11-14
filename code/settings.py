@@ -1,6 +1,22 @@
 import pygame
 from random import choice, randint
 from math import log, exp, atan2, degrees
+import sys
+import os
+
+# Source - https://stackoverflow.com/a
+# Posted by max, modified by community. See post 'Timeline' for change history
+# Retrieved 2025-11-13, License - CC BY-SA 3.0
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280,720
